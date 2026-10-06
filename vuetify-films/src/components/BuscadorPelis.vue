@@ -3,7 +3,7 @@
 import { ref } from 'vue'
 import { cercar } from '@/services/communicationManager'
 import { mesInfo } from '@/services/communicationManager'
-
+import FitxaPelicules from './FitxaPelicules.vue'
 const cerca = ref('')
 const resultats = ref([])
 const info = ref([])
@@ -11,6 +11,12 @@ const info = ref([])
 async function Buscar() {
 
   resultats.value = await cercar(cerca.value)
+
+}
+
+async function clear() {
+
+  resultats.value = ""
 
 }
 
@@ -23,42 +29,26 @@ async function Info(imdbID) {
 </script>
 
 <template>
-
-  <v-text-field v-model="cerca" label="Escriu la pel·licula"></v-text-field>
-  <v-btn @click=Buscar>Cercar</v-btn>
-
+  <div class="search-bar">
+    <v-text-field class="cercador" variant="outlined" v-model="cerca" label="Escriu la pel·licula"></v-text-field>
+    <v-btn class="button_cercar" @click=Buscar>Cercar</v-btn>
+    <v-btn class="button_cercar" @click=clear>Netejar</v-btn>
+  </div>
   <v-row>
 
     <v-col v-for="film in resultats" cols="12" md="4">
-
-      <v-card class="ma-3 pa-3">
-        <img :src="film.Poster" alt="">
-        <p>{{ film.Title }}</p>
-        <p>{{ film.Year }}</p>
-        <v-dialog max-width="500">
-          <template v-slot:activator="{ props: activatorProps }">
-            <v-btn @click="Info(film.imdbID)" v-bind="activatorProps" color="surface-variant" text="Més informació" variant="flat"></v-btn>
-          </template>
-
-          <template v-slot:default="{ isActive }">
-            <v-card :title="film.Title">
-              <v-card-text>
-                {{ info.Plot }}
-              </v-card-text>
-
-              <v-card-actions>
-                <v-spacer></v-spacer>
-
-                <v-btn text="Tancar" @click="isActive.value = false"></v-btn>
-              </v-card-actions>
-            </v-card>
-          </template>
-        </v-dialog>
-
-      </v-card>
+      <FitxaPelicules
+      :film="film"
+      :info="info[film.imdbID]"
+      @request-info="Info"
+      />
 
     </v-col>
 
   </v-row>
 
 </template>
+
+<style scoped>
+
+</style>
